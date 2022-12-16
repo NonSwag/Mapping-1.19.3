@@ -1,4 +1,4 @@
-package net.nonswag.tnl.mappings.v1_19_R3.api.packets.incoming;
+package net.nonswag.tnl.mappings.v1_19_R2.api.packets.incoming;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.state.properties.StructureMode;
 import net.nonswag.core.api.annotation.FieldsAreNonnullByDefault;
 import net.nonswag.core.api.annotation.MethodsReturnNonnullByDefault;
 import net.nonswag.core.api.logger.Logger;
+import net.nonswag.tnl.listener.api.chat.LastSeenMessages;
 import net.nonswag.tnl.listener.api.item.TNLItem;
 import net.nonswag.tnl.listener.api.location.BlockPosition;
 import net.nonswag.tnl.listener.api.location.Direction;
@@ -34,8 +35,8 @@ import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 
-import static net.nonswag.tnl.mappings.v1_19_R3.api.helper.NMSHelper.nullable;
-import static net.nonswag.tnl.mappings.v1_19_R3.api.helper.NMSHelper.wrap;
+import static net.nonswag.tnl.mappings.v1_19_R2.api.helper.NMSHelper.nullable;
+import static net.nonswag.tnl.mappings.v1_19_R2.api.helper.NMSHelper.wrap;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -73,41 +74,32 @@ public class IncomingPacketManager implements Incoming {
     }
 
     @Override
-    public ChatAckPacket chatAckPacket(net.nonswag.tnl.listener.api.chat.LastSeenMessages.Update lastSeenMessages) {
-        return new ChatAckPacket(lastSeenMessages) {
+    public ChatAckPacket chatAckPacket(int offset) {
+        return new ChatAckPacket(offset) {
             @Override
             public ServerboundChatAckPacket build() {
-                return new ServerboundChatAckPacket(wrap(getLastSeenMessages()));
+                return new ServerboundChatAckPacket(getOffset());
             }
         };
     }
 
     @Override
-    public ChatCommandPacket chatCommandPacket(String command, Instant timeStamp, long salt, ChatCommandPacket.Entry[] argumentSignatures, boolean signedPreview, net.nonswag.tnl.listener.api.chat.LastSeenMessages.Update lastSeenMessages) {
-        return new ChatCommandPacket(command, timeStamp, salt, argumentSignatures, signedPreview, lastSeenMessages) {
+    public ChatCommandPacket chatCommandPacket(String command, Instant timeStamp, long salt, ChatCommandPacket.Entry[] argumentSignatures, LastSeenMessages.Update lastSeenMessages) {
+        return new ChatCommandPacket(command, timeStamp, salt, argumentSignatures, lastSeenMessages) {
             @Override
             public ServerboundChatCommandPacket build() {
-                return new ServerboundChatCommandPacket(getCommand(), getTimeStamp(), getSalt(), wrap(getArgumentSignatures()), isSignedPreview(), wrap(getLastSeenMessages()));
+                return new ServerboundChatCommandPacket(getCommand(), getTimeStamp(), getSalt(), wrap(getArgumentSignatures()), wrap(getLastSeenMessages()));
             }
         };
     }
 
     @Override
-    public ChatPacket chatPacket(String message, Instant timeStamp, long salt, byte[] signature, boolean signedPreview, net.nonswag.tnl.listener.api.chat.LastSeenMessages.Update lastSeenMessages) {
-        return new ChatPacket(message, timeStamp, salt, signature, signedPreview, lastSeenMessages) {
+    public ChatPacket chatPacket(String message, Instant timeStamp, long salt, @Nullable byte[] signature, net.nonswag.tnl.listener.api.chat.LastSeenMessages.Update lastSeenMessages) {
+        return new ChatPacket(message, timeStamp, salt, signature, lastSeenMessages) {
             @Override
             public ServerboundChatPacket build() {
-                return new ServerboundChatPacket(getMessage(), getTimeStamp(), getSalt(), new MessageSignature(getSignature()), isSignedPreview(), wrap(getLastSeenMessages()));
-            }
-        };
-    }
-
-    @Override
-    public ChatPreviewPacket chatPreviewPacket(int queryId, String query) {
-        return new ChatPreviewPacket(queryId, query) {
-            @Override
-            public ServerboundChatPreviewPacket build() {
-                return new ServerboundChatPreviewPacket(getQueryId(), getQuery());
+                return new ServerboundChatPacket(getMessage(), getTimeStamp(), getSalt(),
+                        getSignature() != null ? new MessageSignature(getSignature()) : null, wrap(getLastSeenMessages()));
             }
         };
     }
@@ -693,7 +685,6 @@ public class IncomingPacketManager implements Incoming {
         put(ServerboundChatAckPacket.class, ChatAckPacket.class);
         put(ServerboundChatCommandPacket.class, ChatCommandPacket.class);
         put(ServerboundChatPacket.class, ChatPacket.class);
-        put(ServerboundChatPreviewPacket.class, ChatPreviewPacket.class);
         put(ServerboundClientCommandPacket.class, ClientCommandPacket.class);
         put(ServerboundClientInformationPacket.class, ClientInformationPacket.class);
         put(ServerboundCommandSuggestionPacket.class, CommandSuggestionPacket.class);
@@ -883,10 +874,8 @@ public class IncomingPacketManager implements Incoming {
                 case LEFT -> Hand.Side.LEFT;
                 case RIGHT -> Hand.Side.RIGHT;
             }, instance.textFilteringEnabled(), instance.allowsListing());
-        } else if (packet instanceof ServerboundChatPreviewPacket instance) {
-            return ChatPreviewPacket.create(instance.queryId(), instance.query());
         } else if (packet instanceof ServerboundChatAckPacket instance) {
-            return ChatAckPacket.create(wrap(instance.lastSeenMessages()));
+            return ChatAckPacket.create(instance.offset());
         } else if (packet instanceof ServerboundChangeDifficultyPacket instance) {
             return ChangeDifficultyPacket.create(wrap(instance.getDifficulty()));
         } else if (packet instanceof ServerboundBlockEntityTagQuery instance) {
@@ -895,10 +884,10 @@ public class IncomingPacketManager implements Incoming {
             return AcceptTeleportationPacket.create(instance.getId());
         } else if (packet instanceof ServerboundChatPacket instance) {
             return ChatPacket.create(instance.message(), instance.timeStamp(), instance.salt(),
-                    instance.signature().bytes(), instance.signedPreview(), wrap(instance.lastSeenMessages()));
+                    instance.signature() != null ? instance.signature().bytes() : null, wrap(instance.lastSeenMessages()));
         } else if (packet instanceof ServerboundChatCommandPacket instance) {
             return ChatCommandPacket.create(instance.command(), instance.timeStamp(), instance.salt(),
-                    wrap(instance.argumentSignatures().entries()), instance.signedPreview(), wrap(instance.lastSeenMessages()));
+                    wrap(instance.argumentSignatures().entries()), wrap(instance.lastSeenMessages()));
         } else if (packet instanceof ServerboundClientCommandPacket instance) {
             return ClientCommandPacket.create(switch (instance.getAction()) {
                 case PERFORM_RESPAWN -> ClientCommandPacket.Action.PERFORM_RESPAWN;

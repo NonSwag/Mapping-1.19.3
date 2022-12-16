@@ -1,4 +1,4 @@
-package net.nonswag.tnl.mappings.v1_19_R3.api.helper;
+package net.nonswag.tnl.mappings.v1_19_R2.api.helper;
 
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -8,9 +8,9 @@ import net.nonswag.tnl.listener.api.world.Dimension;
 import net.nonswag.tnl.listener.api.world.WorldHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_19_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R2.CraftServer;
+import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;

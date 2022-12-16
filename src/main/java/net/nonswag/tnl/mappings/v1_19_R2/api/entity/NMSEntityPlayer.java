@@ -1,9 +1,14 @@
-package net.nonswag.tnl.mappings.v1_19_R3.api.entity;
+package net.nonswag.tnl.mappings.v1_19_R2.api.entity;
 
 import com.mojang.authlib.properties.Property;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.GameType;
+import net.nonswag.core.api.reflection.Reflection;
+import net.nonswag.tnl.listener.api.chat.ChatSession;
 import net.nonswag.tnl.listener.api.entity.TNLEntityPlayer;
+import net.nonswag.tnl.listener.api.gamemode.Gamemode;
 import net.nonswag.tnl.listener.api.item.SlotType;
 import net.nonswag.tnl.listener.api.item.TNLItem;
 import net.nonswag.tnl.listener.api.player.GameProfile;
@@ -11,12 +16,14 @@ import net.nonswag.tnl.listener.api.player.Skin;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_19_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_19_R2.CraftServer;
+import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
+import org.jetbrains.annotations.Nullable;
 
-import static net.nonswag.tnl.mappings.v1_19_R3.api.helper.NMSHelper.wrap;
+import static net.nonswag.tnl.mappings.v1_19_R2.api.helper.NMSHelper.nullable;
+import static net.nonswag.tnl.mappings.v1_19_R2.api.helper.NMSHelper.wrap;
 
 public class NMSEntityPlayer implements TNLEntityPlayer {
 
@@ -26,8 +33,7 @@ public class NMSEntityPlayer implements TNLEntityPlayer {
     private boolean cape = false;
 
     public NMSEntityPlayer(World world, double x, double y, double z, float yaw, float pitch, GameProfile profile) {
-        this.player = new ServerPlayer(((CraftServer) Bukkit.getServer()).getServer(), ((CraftWorld) world).getHandle(),
-                new com.mojang.authlib.GameProfile(profile.getUniqueId(), profile.getName()), null);
+        this.player = new ServerPlayer(((CraftServer) Bukkit.getServer()).getServer(), ((CraftWorld) world).getHandle(), wrap(profile));
         player.moveTo(x, y, z, yaw, pitch);
         Skin skin = profile.getSkin();
         if (skin != null) {
@@ -70,11 +76,34 @@ public class NMSEntityPlayer implements TNLEntityPlayer {
             case CROAKING -> net.minecraft.world.entity.Pose.CROAKING;
             case EMERGING -> net.minecraft.world.entity.Pose.EMERGING;
             case SNIFFING -> net.minecraft.world.entity.Pose.SNIFFING;
+            case SITTING -> net.minecraft.world.entity.Pose.SITTING;
             case LONG_JUMPING -> net.minecraft.world.entity.Pose.LONG_JUMPING;
             case USING_TONGUE -> net.minecraft.world.entity.Pose.USING_TONGUE;
             case STANDING -> net.minecraft.world.entity.Pose.STANDING;
             case SWIMMING -> net.minecraft.world.entity.Pose.SWIMMING;
         });
+    }
+
+    @Override
+    public Gamemode getGamemode() {
+        return wrap(player.gameMode.getGameModeForPlayer());
+    }
+
+    @Override
+    public void setGamemode(Gamemode gamemode) {
+        Reflection.Field.setByType(player.gameMode, GameType.class, player.gameMode.getGameModeForPlayer(), 1);
+        Reflection.Field.setByType(player.gameMode, GameType.class, wrap(gamemode));
+    }
+
+    @Nullable
+    @Override
+    public ChatSession getChatSession() {
+        return nullable(player.getChatSession());
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return player.adventure$displayName;
     }
 
     @Override
@@ -90,6 +119,7 @@ public class NMSEntityPlayer implements TNLEntityPlayer {
             case DYING -> Pose.DYING;
             case CROAKING -> Pose.CROAKING;
             case USING_TONGUE -> Pose.USING_TONGUE;
+            case SITTING -> Pose.SITTING;
             case ROARING -> Pose.ROARING;
             case SNIFFING -> Pose.SNIFFING;
             case EMERGING -> Pose.EMERGING;
@@ -106,6 +136,11 @@ public class NMSEntityPlayer implements TNLEntityPlayer {
     @Override
     public boolean getCapeVisibility() {
         return cape;
+    }
+
+    @Override
+    public boolean isListed() {
+        return false;
     }
 
     @Override

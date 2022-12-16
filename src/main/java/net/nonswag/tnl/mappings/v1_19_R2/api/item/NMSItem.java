@@ -1,4 +1,4 @@
-package net.nonswag.tnl.mappings.v1_19_R3.api.item;
+package net.nonswag.tnl.mappings.v1_19_R2.api.item;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.datafixers.util.Pair;
@@ -8,9 +8,9 @@ import net.nonswag.core.api.logger.Logger;
 import net.nonswag.tnl.listener.api.item.FoodProperties;
 import net.nonswag.tnl.listener.api.item.TNLItem;
 import net.nonswag.tnl.listener.api.nbt.NBTTag;
-import net.nonswag.tnl.mappings.v1_19_R3.api.nbt.NBT;
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_19_R1.potion.CraftPotionEffectType;
+import net.nonswag.tnl.mappings.v1_19_R2.api.nbt.NBT;
+import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_19_R2.potion.CraftPotionEffectType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 

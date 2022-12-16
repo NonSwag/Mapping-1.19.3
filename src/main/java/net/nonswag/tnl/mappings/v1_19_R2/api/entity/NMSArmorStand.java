@@ -1,4 +1,4 @@
-package net.nonswag.tnl.mappings.v1_19_R3.api.entity;
+package net.nonswag.tnl.mappings.v1_19_R2.api.entity;
 
 import net.minecraft.core.Rotations;
 import net.minecraft.network.chat.Component;
@@ -11,13 +11,13 @@ import net.nonswag.tnl.listener.api.item.SlotType;
 import net.nonswag.tnl.listener.api.item.TNLItem;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R2.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
 
 import javax.annotation.Nullable;
 
-import static net.nonswag.tnl.mappings.v1_19_R3.api.helper.NMSHelper.wrap;
+import static net.nonswag.tnl.mappings.v1_19_R2.api.helper.NMSHelper.wrap;
 
 public class NMSArmorStand implements TNLArmorStand {
 

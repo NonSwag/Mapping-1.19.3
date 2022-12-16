@@ -1,31 +1,31 @@
-package net.nonswag.tnl.mappings.v1_19_R3.api.bossbar;
+package net.nonswag.tnl.mappings.v1_19_R2.api.bossbar;
 
+import lombok.Getter;
+import net.nonswag.core.api.annotation.FieldsAreNonnullByDefault;
+import net.nonswag.core.api.annotation.MethodsReturnNonnullByDefault;
 import net.nonswag.tnl.listener.api.bossbar.TNLBossBar;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.craftbukkit.v1_19_R2.boss.CraftBossBar;
 
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
 
+@Getter
+@FieldsAreNonnullByDefault
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class NMSBossBar extends TNLBossBar {
-
-    @Nonnull
     private final String id;
-    @Nonnull
     private String text;
-    @Nonnull
     private BarColor color;
-    @Nonnull
     private BarStyle style;
-    @Nonnull
     private BarFlag[] barFlags;
     private double progress;
-    @Nonnull
     private final CraftBossBar bossBar;
 
-    public NMSBossBar(@Nonnull String id, @Nonnull String text, @Nonnull BarColor color, @Nonnull BarStyle style, double progress, @Nonnull BarFlag... barFlags) {
+    public NMSBossBar(String id, String text, BarColor color, BarStyle style, double progress, BarFlag... barFlags) {
         this.id = id;
         this.text = text;
         this.color = color;
@@ -37,67 +37,28 @@ public class NMSBossBar extends TNLBossBar {
     }
 
     @Override
-    @Nonnull
-    public String getId() {
-        return id;
-    }
-
-    @Nonnull
-    @Override
-    public String getText() {
-        return text;
-    }
-
-    @Nonnull
-    @Override
-    public BarColor getColor() {
-        return color;
-    }
-
-    @Nonnull
-    @Override
-    public BarStyle getStyle() {
-        return style;
-    }
-
-    @Nonnull
-    @Override
-    public BarFlag[] getBarFlags() {
-        return barFlags;
-    }
-
-    @Override
-    public double getProgress() {
-        return progress;
-    }
-
-    @Nonnull
-    @Override
-    public NMSBossBar setText(@Nonnull String text) {
+    public NMSBossBar setText(String text) {
         getBossBar().setTitle(text);
         this.text = text;
         return this;
     }
 
-    @Nonnull
     @Override
-    public NMSBossBar setColor(@Nonnull BarColor color) {
+    public NMSBossBar setColor(BarColor color) {
         getBossBar().setColor(color);
         this.color = color;
         return this;
     }
 
-    @Nonnull
     @Override
-    public NMSBossBar setStyle(@Nonnull BarStyle style) {
+    public NMSBossBar setStyle(BarStyle style) {
         getBossBar().setStyle(style);
         this.style = style;
         return this;
     }
 
-    @Nonnull
     @Override
-    public NMSBossBar setBarFlags(@Nonnull BarFlag... barFlags) {
+    public NMSBossBar setBarFlags(BarFlag... barFlags) {
         for (BarFlag flag : BarFlag.values()) {
             if (Arrays.asList(barFlags).contains(flag)) {
                 getBossBar().addFlag(flag);
@@ -109,17 +70,10 @@ public class NMSBossBar extends TNLBossBar {
         return this;
     }
 
-    @Nonnull
     @Override
     public NMSBossBar setProgress(double progress) {
         this.progress = progress;
         getBossBar().setProgress(getProgress());
         return this;
-    }
-
-    @Nonnull
-    @Override
-    public CraftBossBar getBossBar() {
-        return bossBar;
     }
 }

@@ -1,10 +1,10 @@
-package net.nonswag.tnl.mappings.v1_19_R3.api.helper;
+package net.nonswag.tnl.mappings.v1_19_R2.api.helper;
 
 import net.nonswag.core.api.annotation.MethodsReturnNonnullByDefault;
 import net.nonswag.tnl.listener.api.plugin.PluginHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.command.SimpleCommandMap;
-import org.bukkit.craftbukkit.v1_19_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_19_R2.CraftServer;
 
 @MethodsReturnNonnullByDefault
 public class NMSPluginHelper extends PluginHelper {

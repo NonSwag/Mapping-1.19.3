@@ -1,4 +1,4 @@
-package net.nonswag.tnl.mappings.v1_19_R3.api.player.channel;
+package net.nonswag.tnl.mappings.v1_19_R2.api.player.channel;
 
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;

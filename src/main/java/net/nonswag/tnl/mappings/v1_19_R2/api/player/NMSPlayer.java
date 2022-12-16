@@ -1,4 +1,4 @@
-package net.nonswag.tnl.mappings.v1_19_R3.api.player;
+package net.nonswag.tnl.mappings.v1_19_R2.api.player;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -30,6 +30,7 @@ import net.nonswag.core.api.reflection.Reflection;
 import net.nonswag.tnl.listener.Bootstrap;
 import net.nonswag.tnl.listener.Listener;
 import net.nonswag.tnl.listener.api.advancement.Toast;
+import net.nonswag.tnl.listener.api.chat.ChatSession;
 import net.nonswag.tnl.listener.api.entity.TNLEntity;
 import net.nonswag.tnl.listener.api.entity.TNLEntityLiving;
 import net.nonswag.tnl.listener.api.entity.TNLEntityPlayer;
@@ -41,16 +42,17 @@ import net.nonswag.tnl.listener.api.player.Skin;
 import net.nonswag.tnl.listener.api.player.TNLPlayer;
 import net.nonswag.tnl.listener.api.player.manager.*;
 import net.nonswag.tnl.listener.api.sign.SignMenu;
-import net.nonswag.tnl.mappings.v1_19_R3.api.player.channel.PlayerChannelHandler;
-import net.nonswag.tnl.mappings.v1_19_R3.api.player.manager.NMSResourceManager;
+import net.nonswag.tnl.mappings.v1_19_R2.api.helper.NMSHelper;
+import net.nonswag.tnl.mappings.v1_19_R2.api.player.channel.PlayerChannelHandler;
+import net.nonswag.tnl.mappings.v1_19_R2.api.player.manager.NMSResourceManager;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R1.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R2.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -132,6 +134,11 @@ public class NMSPlayer extends TNLPlayer {
     }
 
     @Override
+    public ChatSession getChatSession() {
+        return NMSHelper.nullable(nms().getChatSession());
+    }
+
+    @Override
     public int getPing() {
         return nms().latency;
     }
@@ -140,6 +147,7 @@ public class NMSPlayer extends TNLPlayer {
     public Pose getPlayerPose() {
         return switch (nms().getPose()) {
             case DIGGING -> Pose.DIGGING;
+            case SITTING -> Pose.SITTING;
             case ROARING -> Pose.ROARING;
             case CROAKING -> Pose.CROAKING;
             case EMERGING -> Pose.EMERGING;
@@ -169,6 +177,7 @@ public class NMSPlayer extends TNLPlayer {
             case CROAKING -> net.minecraft.world.entity.Pose.CROAKING;
             case EMERGING -> net.minecraft.world.entity.Pose.EMERGING;
             case SNIFFING -> net.minecraft.world.entity.Pose.SNIFFING;
+            case SITTING -> net.minecraft.world.entity.Pose.SITTING;
             case LONG_JUMPING -> net.minecraft.world.entity.Pose.LONG_JUMPING;
             case USING_TONGUE -> net.minecraft.world.entity.Pose.USING_TONGUE;
             case STANDING -> net.minecraft.world.entity.Pose.STANDING;
@@ -460,9 +469,10 @@ public class NMSPlayer extends TNLPlayer {
                 int id = entity.getEntityId();
                 RemoveEntitiesPacket.create(id).send(receiver);
                 if (entity instanceof TNLEntityPlayer player) {
-                    PlayerInfoPacket.create(player, PlayerInfoPacket.Action.REMOVE_PLAYER).send(receiver);
+                    PlayerInfoRemovePacket.create(player.getGameProfile().getUniqueId()).send(receiver);
                     Reflection.Field.set(entity, Entity.class, "id", getPlayer().getEntityId());
-                    PlayerInfoPacket.create(player, PlayerInfoPacket.Action.ADD_PLAYER).send(receiver);
+                    PlayerInfoUpdatePacket.Entry entry = new PlayerInfoUpdatePacket.Entry(player);
+                    PlayerInfoUpdatePacket.create(PlayerInfoUpdatePacket.Action.ADD_PLAYER, entry).send(receiver);
                     AddPlayerPacket.create(player).send(receiver);
                 } else if (entity instanceof TNLEntityLiving livingEntity) {
                     Reflection.Field.set(entity, Entity.class, "id", getPlayer().getEntityId());

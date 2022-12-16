@@ -1,6 +1,8 @@
-package net.nonswag.tnl.mappings.v1_19_R3.api.helper;
+package net.nonswag.tnl.mappings.v1_19_R2.api.helper;
 
 import com.google.gson.JsonObject;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import com.mojang.brigadier.Message;
 import com.mojang.brigadier.context.StringRange;
 import com.mojang.brigadier.suggestion.Suggestion;
@@ -20,20 +22,22 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.LastSeenMessages;
 import net.minecraft.network.chat.MessageSignature;
+import net.minecraft.network.chat.RemoteChatSession;
 import net.minecraft.network.protocol.game.ClientboundGameEventPacket;
-import net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.ProfilePublicKey;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.trading.MerchantOffer;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -41,6 +45,9 @@ import net.nonswag.core.api.annotation.FieldsAreNonnullByDefault;
 import net.nonswag.core.api.annotation.MethodsReturnNonnullByDefault;
 import net.nonswag.core.api.reflection.Reflection;
 import net.nonswag.tnl.listener.api.advancement.Advancement;
+import net.nonswag.tnl.listener.api.chat.ChatSession;
+import net.nonswag.tnl.listener.api.chat.LastSeenMessages;
+import net.nonswag.tnl.listener.api.gamemode.Gamemode;
 import net.nonswag.tnl.listener.api.gui.Interaction;
 import net.nonswag.tnl.listener.api.item.SlotType;
 import net.nonswag.tnl.listener.api.item.TNLItem;
@@ -52,12 +59,13 @@ import net.nonswag.tnl.listener.api.packets.incoming.SetBeaconPacket;
 import net.nonswag.tnl.listener.api.packets.incoming.UseItemOnPacket;
 import net.nonswag.tnl.listener.api.packets.outgoing.*;
 import net.nonswag.tnl.listener.api.player.Hand;
-import net.nonswag.tnl.mappings.v1_19_R3.api.nbt.NBT;
+import net.nonswag.tnl.listener.api.player.Skin;
+import net.nonswag.tnl.mappings.v1_19_R2.api.nbt.NBT;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftChatMessage;
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftChatMessage;
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
 
@@ -140,13 +148,13 @@ public final class NMSHelper {
         return new Advancement.Progress(criteriaProgress, requirements);
     }
 
-    private static CriterionProgress wrap(Advancement.Criterion.Progress progress) {
+    public static CriterionProgress wrap(Advancement.Criterion.Progress progress) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.ROOT);
         if (progress.getDateObtained() == null) return new CriterionProgress();
         return CriterionProgress.fromJson(format.format(progress.getDateObtained()));
     }
 
-    private static Advancement.Criterion.Progress wrap(CriterionProgress progress) {
+    public static Advancement.Criterion.Progress wrap(CriterionProgress progress) {
         return new Advancement.Criterion.Progress(progress.getObtained());
     }
 
@@ -187,7 +195,7 @@ public final class NMSHelper {
                 advancement.getRequirements(), children, wrap(advancement.getChatComponent()));
     }
 
-    private static Criterion wrap(Advancement.Criterion<SerializationContext> criterion) {
+    public static Criterion wrap(Advancement.Criterion<SerializationContext> criterion) {
         return new Criterion(new CriterionTriggerInstance() {
             @Override
             public ResourceLocation getCriterion() {
@@ -201,7 +209,7 @@ public final class NMSHelper {
         });
     }
 
-    private static Advancement.Criterion<SerializationContext> wrap(Criterion criterion) {
+    public static Advancement.Criterion<SerializationContext> wrap(Criterion criterion) {
         if (criterion.getTrigger() == null) throw new NullPointerException("criterion");
         return new Advancement.Criterion<>(wrap(criterion.getTrigger().getCriterion())) {
             @Override
@@ -211,12 +219,12 @@ public final class NMSHelper {
         };
     }
 
-    private static AdvancementRewards wrap(Advancement.Rewards rewards) {
+    public static AdvancementRewards wrap(Advancement.Rewards rewards) {
         return new AdvancementRewards(rewards.getExperience(), wrap(rewards.getLoot()), wrap(rewards.getRecipes()),
                 new CommandFunction.CacheableFunction(nullable(rewards.getFunction())));
     }
 
-    private static Advancement.Rewards wrap(AdvancementRewards rewards) {
+    public static Advancement.Rewards wrap(AdvancementRewards rewards) {
         Integer experience = Reflection.Field.getByType(rewards, int.class);
         ResourceLocation[] loot = Reflection.Field.getByType(rewards, ResourceLocation[].class);
         CommandFunction.CacheableFunction function = Reflection.Field.getByType(rewards, CommandFunction.CacheableFunction.class);
@@ -257,7 +265,7 @@ public final class NMSHelper {
         return displayInfo != null ? wrap(displayInfo) : null;
     }
 
-    private static FrameType wrap(Advancement.FrameType frame) {
+    public static FrameType wrap(Advancement.FrameType frame) {
         return switch (frame) {
             case GOAL -> FrameType.GOAL;
             case TASK -> FrameType.TASK;
@@ -265,7 +273,7 @@ public final class NMSHelper {
         };
     }
 
-    private static Advancement.FrameType wrap(FrameType frame) {
+    public static Advancement.FrameType wrap(FrameType frame) {
         return switch (frame) {
             case GOAL -> Advancement.FrameType.GOAL;
             case TASK -> Advancement.FrameType.TASK;
@@ -486,16 +494,6 @@ public final class NMSHelper {
         } else throw new IllegalStateException("Unmapped game event type");
     }
 
-    public static ClientboundPlayerInfoPacket.Action wrap(PlayerInfoPacket.Action action) {
-        return switch (action) {
-            case ADD_PLAYER -> ClientboundPlayerInfoPacket.Action.ADD_PLAYER;
-            case REMOVE_PLAYER -> ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER;
-            case UPDATE_LATENCY -> ClientboundPlayerInfoPacket.Action.UPDATE_LATENCY;
-            case UPDATE_GAME_MODE -> ClientboundPlayerInfoPacket.Action.UPDATE_GAME_MODE;
-            case UPDATE_DISPLAY_NAME -> ClientboundPlayerInfoPacket.Action.UPDATE_DISPLAY_NAME;
-        };
-    }
-
     public static SoundSource wrap(SoundCategory category) {
         return switch (category) {
             case MASTER -> SoundSource.MASTER;
@@ -617,34 +615,117 @@ public final class NMSHelper {
         return new ArgumentSignatures(entries);
     }
 
-    public static net.nonswag.tnl.listener.api.chat.LastSeenMessages.Update wrap(LastSeenMessages.Update lastSeenMessages) {
-        List<net.nonswag.tnl.listener.api.chat.LastSeenMessages.Entry> entries = new ArrayList<>();
-        lastSeenMessages.lastSeen().entries().forEach(entry -> entries.add(wrap(entry)));
-        return new net.nonswag.tnl.listener.api.chat.LastSeenMessages.Update(new net.nonswag.tnl.listener.api.chat.LastSeenMessages(entries), nullable(lastSeenMessages.lastReceived().orElse(null)));
+    public static LastSeenMessages.Update wrap(net.minecraft.network.chat.LastSeenMessages.Update update) {
+        return new LastSeenMessages.Update(update.offset(), update.acknowledged());
     }
 
-    public static net.nonswag.tnl.listener.api.chat.LastSeenMessages.Entry wrap(LastSeenMessages.Entry entry) {
-        return new net.nonswag.tnl.listener.api.chat.LastSeenMessages.Entry(entry.profileId(), entry.lastSignature().bytes());
+    public static net.minecraft.network.chat.LastSeenMessages.Update wrap(LastSeenMessages.Update update) {
+        return new net.minecraft.network.chat.LastSeenMessages.Update(update.getOffset(), update.getAcknowledged());
     }
 
-    @Nullable
-    public static net.nonswag.tnl.listener.api.chat.LastSeenMessages.Entry nullable(@Nullable LastSeenMessages.Entry entry) {
-        return entry != null ? wrap(entry) : null;
-    }
-
-    public static LastSeenMessages.Update wrap(net.nonswag.tnl.listener.api.chat.LastSeenMessages.Update lastSeenMessages) {
-        List<LastSeenMessages.Entry> entries = new ArrayList<>();
-        lastSeenMessages.getLastSeen().getEntries().forEach(entry -> entries.add(wrap(entry)));
-        return new LastSeenMessages.Update(new LastSeenMessages(entries), Optional.ofNullable(nullable(lastSeenMessages.getLastReceived())));
-    }
-
-    public static LastSeenMessages.Entry wrap(net.nonswag.tnl.listener.api.chat.LastSeenMessages.Entry entry) {
-        return new LastSeenMessages.Entry(entry.profileId(), new MessageSignature(entry.lastSignature()));
+    public static ChatSession wrap(RemoteChatSession chatSession) {
+        return new ChatSession(chatSession.sessionId(), wrap(chatSession.profilePublicKey().data()));
     }
 
     @Nullable
-    public static LastSeenMessages.Entry nullable(@Nullable net.nonswag.tnl.listener.api.chat.LastSeenMessages.Entry entry) {
-        return entry != null ? wrap(entry) : null;
+    public static ChatSession nullable(@Nullable RemoteChatSession chatSession) {
+        return chatSession != null ? wrap(chatSession) : null;
+    }
+
+    public static ChatSession wrap(RemoteChatSession.Data chatSession) {
+        return new ChatSession(chatSession.sessionId(), wrap(chatSession.profilePublicKey()));
+    }
+
+    @Nullable
+    public static ChatSession nullable(@Nullable RemoteChatSession.Data chatSession) {
+        return chatSession != null ? wrap(chatSession) : null;
+    }
+
+    public static RemoteChatSession.Data wrap(ChatSession chatSession) {
+        return new RemoteChatSession.Data(chatSession.getSessionId(), wrap(chatSession.getPublicKey()));
+    }
+
+    @Nullable
+    public static RemoteChatSession.Data nullable(@Nullable ChatSession chatSession) {
+        return chatSession != null ? wrap(chatSession) : null;
+    }
+
+    public static ChatSession.PublicKey wrap(ProfilePublicKey.Data data) {
+        return new ChatSession.PublicKey(data.expiresAt(), data.key(), data.keySignature());
+    }
+
+    public static ProfilePublicKey.Data wrap(ChatSession.PublicKey key) {
+        return new ProfilePublicKey.Data(key.getExpiresAt(), key.getKey(), key.getSignature());
+    }
+
+    public static PlayerInfoUpdatePacket.Action wrap(ClientboundPlayerInfoUpdatePacket.Action action) {
+        return switch (action) {
+            case ADD_PLAYER -> PlayerInfoUpdatePacket.Action.ADD_PLAYER;
+            case INITIALIZE_CHAT -> PlayerInfoUpdatePacket.Action.INITIALIZE_CHAT;
+            case UPDATE_GAME_MODE -> PlayerInfoUpdatePacket.Action.UPDATE_GAME_MODE;
+            case UPDATE_LISTED -> PlayerInfoUpdatePacket.Action.UPDATE_LISTED;
+            case UPDATE_LATENCY -> PlayerInfoUpdatePacket.Action.UPDATE_LATENCY;
+            case UPDATE_DISPLAY_NAME -> PlayerInfoUpdatePacket.Action.UPDATE_DISPLAY_NAME;
+        };
+    }
+
+    public static ClientboundPlayerInfoUpdatePacket.Action wrap(PlayerInfoUpdatePacket.Action action) {
+        return switch (action) {
+            case ADD_PLAYER -> ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER;
+            case UPDATE_GAME_MODE -> ClientboundPlayerInfoUpdatePacket.Action.UPDATE_GAME_MODE;
+            case UPDATE_LATENCY -> ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LATENCY;
+            case UPDATE_DISPLAY_NAME -> ClientboundPlayerInfoUpdatePacket.Action.UPDATE_DISPLAY_NAME;
+            case INITIALIZE_CHAT -> ClientboundPlayerInfoUpdatePacket.Action.INITIALIZE_CHAT;
+            case UPDATE_LISTED -> ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LISTED;
+        };
+    }
+
+    public static PlayerInfoUpdatePacket.Entry wrap(ClientboundPlayerInfoUpdatePacket.Entry entry) {
+        return new PlayerInfoUpdatePacket.Entry(wrap(entry.profile()), entry.listed(), entry.latency(),
+                wrap(entry.gameMode()), nullable(entry.displayName()), nullable(entry.chatSession()));
+    }
+
+    public static ClientboundPlayerInfoUpdatePacket.Entry wrap(PlayerInfoUpdatePacket.Entry entry) {
+        return new ClientboundPlayerInfoUpdatePacket.Entry(entry.getProfile().getUniqueId(), wrap(entry.getProfile()),
+                entry.isListed(), entry.getPing(), wrap(entry.getGamemode()), nullable(entry.getDisplayName()), nullable(entry.getChatSession()));
+    }
+
+    public static Gamemode wrap(GameType gameType) {
+        return switch (gameType) {
+            case SURVIVAL -> Gamemode.SURVIVAL;
+            case CREATIVE -> Gamemode.CREATIVE;
+            case ADVENTURE -> Gamemode.ADVENTURE;
+            case SPECTATOR -> Gamemode.SPECTATOR;
+        };
+    }
+
+    public static GameType wrap(Gamemode gamemode) {
+        return switch (gamemode) {
+            case SURVIVAL -> GameType.SURVIVAL;
+            case CREATIVE -> GameType.CREATIVE;
+            case ADVENTURE -> GameType.ADVENTURE;
+            case SPECTATOR -> GameType.SPECTATOR;
+        };
+    }
+
+    public static net.nonswag.tnl.listener.api.player.GameProfile wrap(GameProfile profile) {
+        Skin skin = nullable(profile.getProperties().get("textures"));
+        return new net.nonswag.tnl.listener.api.player.GameProfile(profile.getId(), profile.getName(), skin);
+    }
+
+    public static GameProfile wrap(net.nonswag.tnl.listener.api.player.GameProfile profile) {
+        GameProfile gameProfile = new GameProfile(profile.getUniqueId(), profile.getName());
+        if (profile.getSkin() == null) return gameProfile;
+        gameProfile.getProperties().put("textures", new Property("textures", profile.getSkin().getValue(), profile.getSkin().getSignature()));
+        return gameProfile;
+    }
+
+    @Nullable
+    public static Skin nullable(Collection<Property> properties) {
+        if (properties.isEmpty()) return null;
+        Property texture = new ArrayList<>(properties).get(0);
+        if (texture == null || !texture.hasSignature() || texture.getValue() == null) return null;
+        return new Skin(texture.getValue(), texture.getSignature());
     }
 
     public static BlockPos wrap(BlockPosition position) {
@@ -705,12 +786,11 @@ public final class NMSHelper {
     @Nullable
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public static SetBeaconPacket.Effect wrap(Optional<MobEffect> optional) {
-        if (optional.isEmpty()) return null;
-        return new SetBeaconPacket.Effect(switch (optional.get().getCategory()) {
+        return optional.map(mobEffect -> new SetBeaconPacket.Effect(switch (mobEffect.getCategory()) {
             case HARMFUL -> SetBeaconPacket.Effect.Category.HARMFUL;
             case NEUTRAL -> SetBeaconPacket.Effect.Category.NEUTRAL;
             case BENEFICIAL -> SetBeaconPacket.Effect.Category.BENEFICIAL;
-        }, optional.get().getColor(), MobEffect.getId(optional.get()));
+        }, mobEffect.getColor(), MobEffect.getId(mobEffect))).orElse(null);
     }
 
     public static TNLItem wrap(ItemStack item) {

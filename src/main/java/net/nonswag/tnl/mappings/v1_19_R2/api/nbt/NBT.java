@@ -1,128 +1,129 @@
-package net.nonswag.tnl.mappings.v1_19_R3.api.nbt;
+package net.nonswag.tnl.mappings.v1_19_R2.api.nbt;
 
 import net.minecraft.nbt.CompoundTag;
+import net.nonswag.core.api.annotation.FieldsAreNonnullByDefault;
+import net.nonswag.core.api.annotation.MethodsReturnNonnullByDefault;
 import net.nonswag.tnl.listener.api.nbt.NBTTag;
 
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
+@FieldsAreNonnullByDefault
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class NBT extends NBTTag {
 
-    @Nonnull
     private final CompoundTag compound;
 
-    public NBT(@Nonnull CompoundTag compound) {
+    public NBT(CompoundTag compound) {
         this.compound = compound;
     }
 
-    @Nonnull
     @Override
-    public String get(@Nonnull String s) {
+    public String get(String s) {
         return versioned().getString(s);
     }
 
     @Override
-    public int getInt(@Nonnull String s) {
+    public int getInt(String s) {
         return versioned().getInt(s);
     }
 
     @Override
-    public double getDouble(@Nonnull String s) {
+    public double getDouble(String s) {
         return versioned().getDouble(s);
     }
 
     @Override
-    public float getFloat(@Nonnull String s) {
+    public float getFloat(String s) {
         return versioned().getFloat(s);
     }
 
     @Override
-    public long getLong(@Nonnull String s) {
+    public long getLong(String s) {
         return versioned().getLong(s);
     }
 
     @Override
-    public short getShort(@Nonnull String s) {
+    public short getShort(String s) {
         return versioned().getShort(s);
     }
 
     @Override
-    public byte getByte(@Nonnull String s) {
+    public byte getByte(String s) {
         return versioned().getByte(s);
     }
 
     @Override
-    public boolean getBoolean(@Nonnull String s) {
+    public boolean getBoolean(String s) {
         return versioned().getBoolean(s);
     }
 
     @Override
-    public int[] getIntArray(@Nonnull String s) {
+    public int[] getIntArray(String s) {
         return versioned().getIntArray(s);
     }
 
     @Override
-    public byte[] getByteArray(@Nonnull String s) {
+    public byte[] getByteArray(String s) {
         return versioned().getByteArray(s);
     }
 
     @Override
-    public void set(@Nonnull String s, @Nonnull String s1) {
+    public void set(String s, String s1) {
         versioned().putString(s, s1);
     }
 
     @Override
-    public void set(@Nonnull String s, int i) {
+    public void set(String s, int i) {
         versioned().putInt(s, i);
     }
 
     @Override
-    public void set(@Nonnull String s, double v) {
+    public void set(String s, double v) {
         versioned().putDouble(s, v);
     }
 
     @Override
-    public void set(@Nonnull String s, float v) {
+    public void set(String s, float v) {
         versioned().putFloat(s, v);
     }
 
     @Override
-    public void set(@Nonnull String s, long l) {
+    public void set(String s, long l) {
         versioned().putLong(s, l);
     }
 
     @Override
-    public void set(@Nonnull String s, short i) {
+    public void set(String s, short i) {
         versioned().putShort(s, i);
     }
 
     @Override
-    public void set(@Nonnull String s, byte b) {
+    public void set(String s, byte b) {
         versioned().putByte(s, b);
     }
 
     @Override
-    public void set(@Nonnull String s, boolean b) {
+    public void set(String s, boolean b) {
         versioned().putBoolean(s, b);
     }
 
     @Override
-    public void set(@Nonnull String s, int[] ints) {
+    public void set(String s, int[] ints) {
         versioned().putIntArray(s, ints);
     }
 
     @Override
-    public void set(@Nonnull String s, byte[] bytes) {
+    public void set(String s, byte[] bytes) {
         versioned().putByteArray(s, bytes);
     }
 
-    @Nonnull
     @Override
-    public NBT append(@Nonnull NBTTag tag) {
+    public NBT append(NBTTag tag) {
         if (tag instanceof NBT nbt) versioned().merge(nbt.versioned());
         return this;
     }
 
-    @Nonnull
     @Override
     public CompoundTag versioned() {
         return compound;

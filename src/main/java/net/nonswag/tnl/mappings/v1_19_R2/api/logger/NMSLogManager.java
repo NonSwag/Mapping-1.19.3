@@ -1,4 +1,4 @@
-package net.nonswag.tnl.mappings.v1_19_R3.api.logger;
+package net.nonswag.tnl.mappings.v1_19_R2.api.logger;
 
 import lombok.Getter;
 import net.nonswag.tnl.listener.api.logger.LogManager;

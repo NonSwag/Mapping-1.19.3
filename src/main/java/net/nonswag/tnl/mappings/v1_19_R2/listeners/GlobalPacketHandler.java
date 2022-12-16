@@ -1,4 +1,4 @@
-package net.nonswag.tnl.mappings.v1_19_R3.listeners;
+package net.nonswag.tnl.mappings.v1_19_R2.listeners;
 
 import com.google.gson.JsonElement;
 import net.kyori.adventure.text.Component;
@@ -31,12 +31,12 @@ import net.nonswag.tnl.listener.api.settings.Settings;
 import net.nonswag.tnl.listener.api.sign.SignMenu;
 import net.nonswag.tnl.listener.events.*;
 import net.nonswag.tnl.listener.events.mods.labymod.LabyPlayerMessageEvent;
-import net.nonswag.tnl.mappings.v1_19_R3.api.player.NMSPlayer;
+import net.nonswag.tnl.mappings.v1_19_R2.api.player.NMSPlayer;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
@@ -44,7 +44,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 
-import static net.nonswag.tnl.mappings.v1_19_R3.api.helper.NMSHelper.wrap;
+import static net.nonswag.tnl.mappings.v1_19_R2.api.helper.NMSHelper.wrap;
 
 @ParametersAreNonnullByDefault
 public class GlobalPacketHandler {

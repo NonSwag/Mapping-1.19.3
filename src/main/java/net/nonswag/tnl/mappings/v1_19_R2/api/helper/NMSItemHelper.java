@@ -1,4 +1,4 @@
-package net.nonswag.tnl.mappings.v1_19_R3.api.helper;
+package net.nonswag.tnl.mappings.v1_19_R2.api.helper;
 
 import com.google.common.collect.ImmutableMap;
 import it.unimi.dsi.fastutil.objects.Object2FloatMap;
@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.ComposterBlock;
 import net.nonswag.core.api.reflection.Reflection;
 import net.nonswag.tnl.listener.api.item.ItemHelper;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

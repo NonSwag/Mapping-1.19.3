@@ -1,4 +1,4 @@
-package net.nonswag.tnl.mappings.v1_19_R3.api.entity;
+package net.nonswag.tnl.mappings.v1_19_R2.api.entity;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.item.FallingBlockEntity;
@@ -8,9 +8,9 @@ import net.nonswag.tnl.listener.api.entity.TNLEntity;
 import net.nonswag.tnl.listener.api.entity.TNLFallingBlock;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R1.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R2.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_19_R2.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 
 public class NMSFallingBlock extends FallingBlockEntity implements TNLFallingBlock {
