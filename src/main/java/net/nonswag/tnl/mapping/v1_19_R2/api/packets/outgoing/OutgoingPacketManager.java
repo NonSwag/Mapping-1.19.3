@@ -1133,6 +1133,16 @@ public final class OutgoingPacketManager implements Outgoing {
         };
     }
 
+    @Override
+    public DisguisedChatPacket disguisedChatPacket(net.kyori.adventure.text.Component message, ChatType chatType) {
+        return new DisguisedChatPacket(message, chatType) {
+            @Override
+            public ClientboundDisguisedChatPacket build() {
+                return new ClientboundDisguisedChatPacket(wrap(getMessage()), wrap(getChatType()));
+            }
+        };
+    }
+
     private final HashMap<Class<? extends Packet<ClientGamePacketListener>>, Class<? extends PacketBuilder>> PACKET_MAP = new HashMap<>() {{
         put(ClientboundAddEntityPacket.class, AddEntityPacket.class);
         put(ClientboundAddExperienceOrbPacket.class, AddExperienceOrbPacket.class);
@@ -1158,6 +1168,7 @@ public final class OutgoingPacketManager implements Outgoing {
         put(ClientboundCustomPayloadPacket.class, CustomPayloadPacket.class);
         put(ClientboundDeleteChatPacket.class, DeleteChatPacket.class);
         put(ClientboundDisconnectPacket.class, DisconnectPacket.class);
+        put(ClientboundDisguisedChatPacket.class, DisguisedChatPacket.class);
         put(ClientboundEntityEventPacket.class, EntityEventPacket.class);
         put(ClientboundExplodePacket.class, ExplodePacket.class);
         put(ClientboundForgetLevelChunkPacket.class, ForgetLevelChunkPacket.class);
@@ -1307,6 +1318,8 @@ public final class OutgoingPacketManager implements Outgoing {
             List<String> entries = new ArrayList<>();
             if (option.needsEntries()) entries = buffer.readCollection(ArrayList::new, FriendlyByteBuf::readUtf);
             return SetPlayerTeamPacket.create(name, option, parameters, entries);
+        } else if (packet instanceof ClientboundDisguisedChatPacket instance) {
+            return DisguisedChatPacket.create(wrap(instance.message()), wrap(instance.chatType()));
         } else if (packet instanceof ClientboundUpdateTagsPacket instance) {
             return new UpdateTagsPacket() {
                 @Override

@@ -42,11 +42,9 @@ import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
-import org.bukkit.generator.BiomeProvider;
 import org.bukkit.inventory.ItemStack;
 import org.spigotmc.SpigotConfig;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
 
@@ -151,11 +149,5 @@ public class Mappings extends Mapping {
     @Override
     public boolean bungeeCord() {
         return SpigotConfig.bungee;
-    }
-
-    @Nullable
-    @Override
-    public BiomeProvider getDefaultBiomeProvider(String name, @Nullable String id) {
-        return null;
     }
 }
