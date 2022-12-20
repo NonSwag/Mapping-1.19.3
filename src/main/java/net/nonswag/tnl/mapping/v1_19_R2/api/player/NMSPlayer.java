@@ -707,7 +707,7 @@ public class NMSPlayer extends TNLPlayer {
             @Override
             public void uninject() {
                 try {
-                    Channel channel = nms().networkManager.channel;
+                    Channel channel = nms().connection.connection.channel;
                     if (channel.pipeline().get(name) != null) {
                         channel.eventLoop().submit(() -> channel.pipeline().remove(name));
                     }
@@ -723,7 +723,7 @@ public class NMSPlayer extends TNLPlayer {
             @Override
             public void inject() {
                 try {
-                    ChannelPipeline pipeline = nms().networkManager.channel.pipeline();
+                    ChannelPipeline pipeline = nms().connection.connection.channel.pipeline();
                     pipeline.addBefore("packet_handler", name, new PlayerChannelHandler() {
                         @Override
                         public TNLPlayer getPlayer() {

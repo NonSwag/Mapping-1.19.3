@@ -3,6 +3,7 @@ package net.nonswag.tnl.mapping.v1_19_R2.api.helper;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import net.nonswag.core.api.annotation.MethodsReturnNonnullByDefault;
 import net.nonswag.tnl.listener.api.player.TNLPlayer;
 import net.nonswag.tnl.listener.api.world.Dimension;
 import net.nonswag.tnl.listener.api.world.WorldHelper;
@@ -12,15 +13,16 @@ import org.bukkit.craftbukkit.v1_19_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
 
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
 public class NMSWorldHelper extends WorldHelper {
 
-    @Nonnull
     @Override
-    public Dimension getDimension(@Nonnull World world) {
+    public Dimension getDimension(World world) {
         ResourceKey<Level> key = ((CraftWorld) world).getHandle().dimension();
         if (key.equals(Level.OVERWORLD)) return Dimension.OVERWORLD;
         else if (key.equals(Level.NETHER)) return Dimension.NETHER;
@@ -29,7 +31,7 @@ public class NMSWorldHelper extends WorldHelper {
     }
 
     @Override
-    public boolean isRegistered(@Nonnull Dimension dimension) {
+    public boolean isRegistered(Dimension dimension) {
         return ((CraftServer) Bukkit.getServer()).getServer().getLevel(switch (dimension) {
             case NETHER -> Level.NETHER;
             case THE_END -> Level.END;
@@ -37,21 +39,16 @@ public class NMSWorldHelper extends WorldHelper {
         }) != null;
     }
 
-    @Nonnull
     @Override
-    public List<TNLPlayer> getPlayers(@Nonnull World world) {
+    public List<TNLPlayer> getPlayers(World world) {
         List<TNLPlayer> players = new ArrayList<>();
         ServerLevel handle = ((CraftWorld) world).getHandle();
         handle.players().forEach(serverPlayer -> players.add(TNLPlayer.cast(serverPlayer.getBukkitEntity())));
-        handle.pendingLogin.forEach(serverPlayer -> {
-            TNLPlayer player = TNLPlayer.cast(serverPlayer.getBukkitEntity());
-            if (!players.contains(player)) players.add(player);
-        });
         return players;
     }
 
     @Override
-    public void removePlayer(@Nonnull World world, @Nonnull TNLPlayer player) {
+    public void removePlayer(World world, TNLPlayer player) {
         ((CraftWorld) world).getHandle().players().remove(((CraftPlayer) player.bukkit()).getHandle());
     }
 }
