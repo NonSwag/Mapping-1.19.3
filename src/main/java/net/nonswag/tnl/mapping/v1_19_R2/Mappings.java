@@ -57,6 +57,7 @@ public class Mappings extends Mapping {
     private PluginHelper pluginHelper;
     private PacketManager packetManager;
     private LogManager logManager;
+    private WorldHelper worldHelper;
     private EntityHelper entityHelper;
 
     public Mappings(File file) {
@@ -115,7 +116,7 @@ public class Mappings extends Mapping {
 
     @Override
     public WorldHelper worldHelper() {
-        return new NMSWorldHelper();
+        return worldHelper == null ? worldHelper = new NMSWorldHelper() : worldHelper;
     }
 
     @Override

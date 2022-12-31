@@ -19,7 +19,7 @@ repositories {
 
 dependencies {
     implementation("org.projectlombok:lombok:1.18.24")
-    implementation("net.nonswag.tnl:listener:6.2.0")
+    implementation("net.nonswag.tnl:listener:6.2.1")
     paperDevBundle("1.19.3-R0.1-SNAPSHOT")
     annotationProcessor("org.projectlombok:lombok:1.18.24")
 }
