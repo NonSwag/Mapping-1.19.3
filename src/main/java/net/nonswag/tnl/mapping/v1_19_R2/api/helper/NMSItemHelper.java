@@ -23,14 +23,14 @@ public class NMSItemHelper extends ItemHelper {
 
     @Override
     public void setMaxStackSize(@Nonnull Material material, int maxStackSize) {
-        Reflection.Field.set(material, "maxStack", maxStackSize);
-        Reflection.Field.set(Item.byId(material.ordinal()), Item.class, "maxStackSize", maxStackSize);
+        Reflection.Field.setByType(material, int.class, 1);
+        Reflection.Field.setByType(Item.byId(material.ordinal()), Item.class, int.class, maxStackSize);
     }
 
     @Override
     public void setDurability(@Nonnull Material material, int durability) {
-        Reflection.Field.set(material, "durability", durability);
-        Reflection.Field.set(Item.byId(material.ordinal()), Item.class, "durability", durability);
+        Reflection.Field.setByType(material, short.class, (short) durability);
+        Reflection.Field.setByType(Item.byId(material.ordinal()), Item.class, int.class, durability, 1);
     }
 
     @Nonnull
