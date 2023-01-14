@@ -21,7 +21,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 import net.nonswag.core.api.annotation.FieldsAreNonnullByDefault;
 import net.nonswag.core.api.annotation.MethodsReturnNonnullByDefault;
-import net.nonswag.core.api.file.formats.TextFile;
 import net.nonswag.core.api.logger.Logger;
 import net.nonswag.core.api.reflection.Reflection;
 import net.nonswag.tnl.listener.api.advancement.Advancement;
@@ -896,11 +895,7 @@ public final class OutgoingPacketManager implements Outgoing {
                 getRemoved().forEach(key -> removed.add(wrap(key)));
                 Map<ResourceLocation, AdvancementProgress> progress = new HashMap<>();
                 getProgress().forEach((key, advancementProgress) -> progress.put(wrap(key), wrap(advancementProgress)));
-                ClientboundUpdateAdvancementsPacket packet = new ClientboundUpdateAdvancementsPacket(isReset(), added, removed, progress);
-                TextFile file = new TextFile("listener.json");
-                file.setContent(packet.toString());
-                file.save();
-                return packet;
+                return new ClientboundUpdateAdvancementsPacket(isReset(), added, removed, progress);
             }
         };
     }

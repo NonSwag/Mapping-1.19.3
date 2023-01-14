@@ -101,7 +101,12 @@ public class Mappings extends Mapping {
 
     @Override
     public Enchant createEnchant(NamespacedKey key, String name, EnchantmentTarget target) {
-        return new EnchantmentWrapper(key, name, target);
+        try {
+            return new EnchantmentWrapper(key, name, target);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
     }
 
     @Override

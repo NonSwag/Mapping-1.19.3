@@ -2,8 +2,8 @@ package net.nonswag.tnl.mapping.v1_19_R2.api.enchantments;
 
 import lombok.Getter;
 import net.kyori.adventure.key.Key;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.FieldsAreNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
@@ -15,18 +15,18 @@ import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.EntityCategory;
 
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Set;
 
 @Getter
+@FieldsAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
 public class EnchantmentWrapper extends Enchant {
-
-    @Nonnull
     private final Enchantment vanilla;
-    @Nonnull
     private final NamespacedKey namespace;
 
-    public EnchantmentWrapper(@Nonnull NamespacedKey key, @Nonnull String name, @Nonnull EnchantmentTarget target) {
+    public EnchantmentWrapper(NamespacedKey key, String name, EnchantmentTarget target) {
         super(key, name, target);
         this.namespace = key;
         this.vanilla = new Enchantment(Enchantment.Rarity.COMMON, EnchantmentCategory.ARMOR, EquipmentSlot.values()) {
@@ -50,18 +50,16 @@ public class EnchantmentWrapper extends Enchant {
                 return EnchantmentWrapper.this.isCursed();
             }
 
-            @Nonnull
             @Override
             public Component getFullname(int level) {
                 return Component.literal(EnchantmentWrapper.this.getName());
             }
 
             @Override
-            public boolean canEnchant(@Nonnull ItemStack itemStack) {
+            public boolean canEnchant(ItemStack itemStack) {
                 return EnchantmentWrapper.this.canEnchantItem(CraftItemStack.asBukkitCopy(itemStack));
             }
 
-            @Nonnull
             @Override
             public Rarity getRarity() {
                 return switch (getRarity()) {
@@ -75,36 +73,31 @@ public class EnchantmentWrapper extends Enchant {
         this.register();
     }
 
-    @Nonnull
     @Override
     protected Enchant register() {
-        Registry.register(BuiltInRegistries.ENCHANTMENT, getNamespace().getKey(), getVanilla());
+        // Registry.register(BuiltInRegistries.ENCHANTMENT, getNamespace().getKey(), getVanilla());
         return super.register();
     }
 
-    @Nonnull
     @Override
     public net.kyori.adventure.text.Component displayName(int level) {
         return net.kyori.adventure.text.Component.text(getName());
     }
 
     @Override
-    public float getDamageIncrease(int level, @Nonnull EntityCategory entityCategory) {
+    public float getDamageIncrease(int level, EntityCategory entityCategory) {
         return 0;
     }
 
-    @Nonnull
     @Override
     public Set<org.bukkit.inventory.EquipmentSlot> getActiveSlots() {
         return Set.of(org.bukkit.inventory.EquipmentSlot.values());
     }
 
-    @Nonnull
     public String translationKey() {
         return "enchantment.unknown";
     }
 
-    @Nonnull
     public Key key() {
         return namespace;
     }

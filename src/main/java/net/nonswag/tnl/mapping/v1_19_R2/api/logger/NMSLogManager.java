@@ -1,6 +1,8 @@
 package net.nonswag.tnl.mapping.v1_19_R2.api.logger;
 
 import lombok.Getter;
+import net.nonswag.core.api.annotation.FieldsAreNonnullByDefault;
+import net.nonswag.core.api.annotation.MethodsReturnNonnullByDefault;
 import net.nonswag.tnl.listener.api.logger.LogManager;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LogEvent;
@@ -8,17 +10,18 @@ import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.filter.AbstractFilter;
 import org.apache.logging.log4j.core.filter.Filterable;
 
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
+@FieldsAreNonnullByDefault
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class NMSLogManager extends LogManager {
 
     @Override
     public void initialize() {
         try {
             ((Logger) org.apache.logging.log4j.LogManager.getRootLogger()).getAppenders().values().forEach(appender -> {
-                if (!(appender instanceof Filterable filter)) return;
-                filter.addFilter(LogRewriter.getInstance());
-                filter.addFilter(Filter.getInstance());
+                if (appender instanceof Filterable filter) filter.addFilter(LogRewriter.getInstance());
             });
         } catch (Throwable t) {
             net.nonswag.core.api.logger.Logger.error.println("Failed to override loggers", t);
@@ -26,13 +29,11 @@ public class NMSLogManager extends LogManager {
     }
 
     private static final class LogRewriter extends AbstractFilter {
-
         @Getter
-        @Nonnull
         private static final LogRewriter instance = new LogRewriter();
 
         @Override
-        public Result filter(@Nonnull LogEvent event) {
+        public Result filter(LogEvent event) {
             String message = event.getMessage().getFormattedMessage();
             net.nonswag.core.api.logger.Logger logger;
             if (event.getLevel().equals(Level.OFF)) return Result.DENY;
@@ -43,22 +44,6 @@ public class NMSLogManager extends LogManager {
             else logger = net.nonswag.core.api.logger.Logger.info;
             logger.println(message);
             return Result.DENY;
-        }
-    }
-
-    public static final class Filter extends AbstractFilter {
-
-        @Getter
-        @Nonnull
-        private static final Filter instance = new Filter();
-
-        private Filter() {
-        }
-
-        @Override
-        public Result filter(@Nonnull LogEvent event) {
-            String message = event.getMessage().getFormattedMessage();
-            return LOG_4_SHELL.matcher(message).find() ? Result.DENY : super.filter(event);
         }
     }
 }
