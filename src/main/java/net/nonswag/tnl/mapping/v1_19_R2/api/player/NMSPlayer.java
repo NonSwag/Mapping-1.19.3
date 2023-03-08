@@ -24,7 +24,6 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.nonswag.core.api.annotation.FieldsAreNullableByDefault;
 import net.nonswag.core.api.annotation.MethodsReturnNonnullByDefault;
-import net.nonswag.core.api.logger.Logger;
 import net.nonswag.core.api.message.Message;
 import net.nonswag.core.api.reflection.Reflection;
 import net.nonswag.tnl.listener.Bootstrap;
@@ -713,7 +712,7 @@ public class NMSPlayer extends TNLPlayer {
                     }
                     data().export();
                 } catch (Exception e) {
-                    Logger.error.println(e);
+                    e.printStackTrace();
                 } finally {
                     players.remove(bukkit());
                     injected = false;
@@ -732,7 +731,7 @@ public class NMSPlayer extends TNLPlayer {
                     });
                     injected = true;
                 } catch (Exception e) {
-                    Logger.error.println(e);
+                    e.printStackTrace();
                     uninject();
                 }
             }

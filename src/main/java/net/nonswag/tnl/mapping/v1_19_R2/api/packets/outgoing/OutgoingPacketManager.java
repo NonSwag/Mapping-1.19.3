@@ -21,7 +21,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 import net.nonswag.core.api.annotation.FieldsAreNonnullByDefault;
 import net.nonswag.core.api.annotation.MethodsReturnNonnullByDefault;
-import net.nonswag.core.api.logger.Logger;
 import net.nonswag.core.api.reflection.Reflection;
 import net.nonswag.tnl.listener.api.advancement.Advancement;
 import net.nonswag.tnl.listener.api.border.VirtualBorder;
@@ -47,6 +46,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -60,6 +61,7 @@ import static net.nonswag.tnl.mapping.v1_19_R2.api.helper.NMSHelper.wrap;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class OutgoingPacketManager implements Outgoing {
+    private static final Logger logger = LoggerFactory.getLogger(OutgoingPacketManager.class);
 
     @Override
     public SetSimulationDistancePacket setSimulationDistancePacket(int simulationDistance) {
@@ -1678,7 +1680,7 @@ public final class OutgoingPacketManager implements Outgoing {
         }
         if (!unmapped.contains(packet.getClass().getName())) {
             unmapped.add(packet.getClass().getName());
-            Logger.warn.println("Unmapped outgoing (vanilla) packet: " + packet.getClass().getName());
+            logger.warn("Unmapped outgoing (vanilla) packet: " + packet.getClass().getName());
         }
         return original.apply(packet);
     }

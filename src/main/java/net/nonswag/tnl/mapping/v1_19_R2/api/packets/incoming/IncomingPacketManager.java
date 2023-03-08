@@ -13,7 +13,6 @@ import net.minecraft.world.level.block.entity.StructureBlockEntity;
 import net.minecraft.world.level.block.state.properties.StructureMode;
 import net.nonswag.core.api.annotation.FieldsAreNonnullByDefault;
 import net.nonswag.core.api.annotation.MethodsReturnNonnullByDefault;
-import net.nonswag.core.api.logger.Logger;
 import net.nonswag.tnl.listener.api.chat.ChatSession;
 import net.nonswag.tnl.listener.api.chat.LastSeenMessages;
 import net.nonswag.tnl.listener.api.chat.MessageSignature;
@@ -30,6 +29,8 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Rotation;
 import org.bukkit.block.structure.Mirror;
 import org.bukkit.util.Vector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -44,6 +45,7 @@ import static net.nonswag.tnl.mapping.v1_19_R2.api.helper.NMSHelper.wrap;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class IncomingPacketManager implements Incoming {
+    private static final Logger logger = LoggerFactory.getLogger(IncomingPacketManager.class);
 
     @Override
     public AcceptTeleportationPacket acceptTeleportationPacket(int id) {
@@ -991,7 +993,7 @@ public class IncomingPacketManager implements Incoming {
         }
         if (!unmapped.contains(packet.getClass().getName())) {
             unmapped.add(packet.getClass().getName());
-            Logger.warn.println("Unmapped incoming packet: " + packet.getClass().getName());
+            logger.warn("Unmapped incoming packet: " + packet.getClass().getName());
         }
         return original.apply(packet);
     }

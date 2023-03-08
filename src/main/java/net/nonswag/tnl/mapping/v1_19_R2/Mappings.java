@@ -10,7 +10,6 @@ import net.nonswag.tnl.listener.api.entity.TNLEntityPlayer;
 import net.nonswag.tnl.listener.api.entity.TNLFallingBlock;
 import net.nonswag.tnl.listener.api.item.ItemHelper;
 import net.nonswag.tnl.listener.api.item.TNLItem;
-import net.nonswag.tnl.listener.api.logger.LogManager;
 import net.nonswag.tnl.listener.api.mapper.Mapping;
 import net.nonswag.tnl.listener.api.packets.incoming.Incoming;
 import net.nonswag.tnl.listener.api.packets.outgoing.Outgoing;
@@ -25,11 +24,10 @@ import net.nonswag.tnl.mapping.v1_19_R2.api.entity.NMSArmorStand;
 import net.nonswag.tnl.mapping.v1_19_R2.api.entity.NMSEntityHelper;
 import net.nonswag.tnl.mapping.v1_19_R2.api.entity.NMSEntityPlayer;
 import net.nonswag.tnl.mapping.v1_19_R2.api.entity.NMSFallingBlock;
+import net.nonswag.tnl.mapping.v1_19_R2.api.helper.NMSItem;
 import net.nonswag.tnl.mapping.v1_19_R2.api.helper.NMSItemHelper;
 import net.nonswag.tnl.mapping.v1_19_R2.api.helper.NMSPluginHelper;
 import net.nonswag.tnl.mapping.v1_19_R2.api.helper.NMSWorldHelper;
-import net.nonswag.tnl.mapping.v1_19_R2.api.item.NMSItem;
-import net.nonswag.tnl.mapping.v1_19_R2.api.logger.NMSLogManager;
 import net.nonswag.tnl.mapping.v1_19_R2.api.packets.incoming.IncomingPacketManager;
 import net.nonswag.tnl.mapping.v1_19_R2.api.packets.outgoing.OutgoingPacketManager;
 import net.nonswag.tnl.mapping.v1_19_R2.api.player.NMSPlayer;
@@ -56,7 +54,6 @@ public class Mappings extends Mapping {
     private ItemHelper itemHelper;
     private PluginHelper pluginHelper;
     private PacketManager packetManager;
-    private LogManager logManager;
     private WorldHelper worldHelper;
     private EntityHelper entityHelper;
 
@@ -122,11 +119,6 @@ public class Mappings extends Mapping {
     @Override
     public WorldHelper worldHelper() {
         return worldHelper == null ? worldHelper = new NMSWorldHelper() : worldHelper;
-    }
-
-    @Override
-    public LogManager logManager() {
-        return logManager == null ? logManager = new NMSLogManager() : logManager;
     }
 
     @Override

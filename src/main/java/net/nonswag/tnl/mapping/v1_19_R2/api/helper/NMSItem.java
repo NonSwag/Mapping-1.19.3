@@ -1,10 +1,9 @@
-package net.nonswag.tnl.mapping.v1_19_R2.api.item;
+package net.nonswag.tnl.mapping.v1_19_R2.api.helper;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.nonswag.core.api.logger.Logger;
 import net.nonswag.tnl.listener.api.item.FoodProperties;
 import net.nonswag.tnl.listener.api.item.TNLItem;
 import net.nonswag.tnl.listener.api.nbt.NBTTag;
@@ -13,6 +12,8 @@ import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_19_R2.potion.CraftPotionEffectType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class NMSItem extends TNLItem {
+    private static final Logger logger = LoggerFactory.getLogger(NMSItem.class);
 
     public NMSItem(@Nonnull ItemStack itemStack) {
         super(itemStack);
@@ -36,7 +38,7 @@ public class NMSItem extends TNLItem {
         try {
             setNBT(getNBT().append(new NBT(TagParser.parseTag(nbt))));
         } catch (CommandSyntaxException e) {
-            Logger.error.println("Failed to modify item nbt", e);
+            logger.error("Failed to modify item nbt", e);
         }
         return this;
     }
